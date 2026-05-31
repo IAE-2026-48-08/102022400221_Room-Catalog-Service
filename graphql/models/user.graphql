@@ -1,0 +1,35 @@
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    email_verified_at: DateTime
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+input CreateUserInput {
+    name: String! @rules(apply: ["max:255"])
+    email: String! @rules(apply: ["email", "max:255", "unique:users,email"])
+    password: String! @rules(apply: ["min:8", "max:255"])
+}
+
+input UpdateUserInput {
+    name: String @rules(apply: ["max:255"])
+    email: String @rules(apply: ["email", "max:255"])
+    password: String @rules(apply: ["min:8", "max:255"])
+}
+
+extend type Query {
+    "Mengambil semua user"
+    users: [User!]! @all
+    "Mengambil satu user berdasarkan ID"
+    user(id: ID! @eq): User @find
+    "Mengambil user berdasarkan email"
+    userByEmail(email: String! @eq): User @find
+}
+
+extend type Mutation {
+    createUser(input: CreateUserInput! @spread): User! @create
+    updateUser(id: ID!, input: UpdateUserInput! @spread): User! @update
+    deleteUser(id: ID!): User @delete
+}

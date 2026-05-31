@@ -1,0 +1,63 @@
+enum RoomType {
+    SINGLE
+    DOUBLE
+    SUITE
+    DELUXE
+}
+
+enum RoomStatus {
+    AVAILABLE
+    OCCUPIED
+    MAINTENANCE
+}
+
+type Room {
+    id: ID!
+    room_number: String!
+    type: RoomType!
+    floor: Int!
+    capacity: Int!
+    price_per_night: Float!
+    status: RoomStatus!
+    description: String
+    facilities: [String!]
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+input CreateRoomInput {
+    room_number: String! @rules(apply: ["max:20", "unique:rooms,room_number"])
+    type: RoomType!
+    floor: Int! @rules(apply: ["min:1"])
+    capacity: Int! @rules(apply: ["min:1"])
+    price_per_night: Float! @rules(apply: ["min:0"])
+    status: RoomStatus!
+    description: String @rules(apply: ["max:1000"])
+    facilities: [String!]
+}
+
+input UpdateRoomInput {
+    room_number: String @rules(apply: ["max:20"])
+    type: RoomType
+    floor: Int @rules(apply: ["min:1"])
+    capacity: Int @rules(apply: ["min:1"])
+    price_per_night: Float @rules(apply: ["min:0"])
+    status: RoomStatus
+    description: String @rules(apply: ["max:1000"])
+    facilities: [String!]
+}
+
+extend type Query {
+    "Mengambil semua room"
+    rooms: [Room!]! @all
+    "Mengambil room berdasarkan status"
+    roomsByStatus(status: RoomStatus! @eq): [Room!]! @all
+    "Mengambil satu room berdasarkan ID"
+    room(id: ID! @eq): Room @find
+}
+
+extend type Mutation {
+    createRoom(input: CreateRoomInput! @spread): Room! @create
+    updateRoom(id: ID!, input: UpdateRoomInput! @spread): Room! @update
+    deleteRoom(id: ID!): Room @delete
+}
