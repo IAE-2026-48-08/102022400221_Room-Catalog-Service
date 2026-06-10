@@ -5,9 +5,11 @@
     "require": {
         "php": "^8.2",
         "darkaonline/l5-swagger": "^8.6",
+        "firebase/php-jwt": "^7.0",
         "laravel/framework": "^11.0",
         "mll-lab/laravel-graphiql": "^4.1",
         "nuwave/lighthouse": "^6.66",
+        "php-amqplib/php-amqplib": "^2.8",
         "zircote/swagger-php": "^4.11"
     },
     "require-dev": {

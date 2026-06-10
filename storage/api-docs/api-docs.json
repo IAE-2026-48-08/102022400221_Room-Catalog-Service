@@ -26,7 +26,6 @@
                     {
                         "name": "status",
                         "in": "query",
-                        "description": "Filter berdasarkan status kamar",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -40,7 +39,6 @@
                     {
                         "name": "type",
                         "in": "query",
-                        "description": "Filter berdasarkan tipe kamar",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -55,50 +53,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Daftar kamar berhasil diambil",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data retrieved successfully"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/Room"
-                                            }
-                                        },
-                                        "meta": {
-                                            "properties": {
-                                                "service_name": {
-                                                    "type": "string",
-                                                    "example": "Room-Catalog-Service"
-                                                },
-                                                "api_version": {
-                                                    "type": "string",
-                                                    "example": "v1"
-                                                },
-                                                "total": {
-                                                    "type": "integer",
-                                                    "example": 10
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - API Key tidak valid"
+                        "description": "Daftar kamar berhasil diambil"
                     }
                 },
                 "security": [
@@ -111,7 +66,7 @@
                 "tags": [
                     "Rooms"
                 ],
-                "summary": "Menambah data kamar baru",
+                "summary": "Menambah data kamar baru (triggers SSO + SOAP audit + RabbitMQ)",
                 "operationId": "49058005cbeb1d687de909882996a7f7",
                 "requestBody": {
                     "required": true,
@@ -137,8 +92,7 @@
                                             "deluxe",
                                             "suite",
                                             "presidential"
-                                        ],
-                                        "example": "deluxe"
+                                        ]
                                     },
                                     "floor": {
                                         "type": "integer",
@@ -153,20 +107,13 @@
                                         "example": 500000
                                     },
                                     "description": {
-                                        "type": "string",
-                                        "example": "Kamar deluxe dengan pemandangan kolam renang"
+                                        "type": "string"
                                     },
                                     "facilities": {
                                         "type": "array",
                                         "items": {
                                             "type": "string"
-                                        },
-                                        "example": [
-                                            "WiFi",
-                                            "AC",
-                                            "TV",
-                                            "Mini Bar"
-                                        ]
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -176,27 +123,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Kamar berhasil ditambahkan",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Room created successfully"
-                                        },
-                                        "data": {
-                                            "$ref": "#/components/schemas/Room"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Kamar berhasil ditambahkan"
                     },
                     "422": {
                         "description": "Validation error"
@@ -223,7 +150,6 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID kamar",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -232,33 +158,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Data kamar berhasil diambil",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data retrieved successfully"
-                                        },
-                                        "data": {
-                                            "$ref": "#/components/schemas/Room"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Data kamar berhasil diambil"
                     },
                     "404": {
                         "description": "Kamar tidak ditemukan"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
                     }
                 },
                 "security": [
@@ -273,7 +176,7 @@
                 "tags": [
                     "Rooms"
                 ],
-                "summary": "Mengubah status kamar (tersedia/terisi/maintenance)",
+                "summary": "Mengubah status kamar",
                 "operationId": "730022709fab2f4645c8499ed6c3226d",
                 "parameters": [
                     {
@@ -300,8 +203,7 @@
                                             "available",
                                             "occupied",
                                             "maintenance"
-                                        ],
-                                        "example": "occupied"
+                                        ]
                                     }
                                 },
                                 "type": "object"
@@ -315,9 +217,6 @@
                     },
                     "404": {
                         "description": "Kamar tidak ditemukan"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
                     }
                 },
                 "security": [
@@ -332,7 +231,7 @@
                 "tags": [
                     "Rooms"
                 ],
-                "summary": "Menetapkan kamar untuk tamu (assign)",
+                "summary": "Menetapkan kamar ke tamu (triggers SSO + SOAP audit + RabbitMQ)",
                 "operationId": "af9d1fe699defbdbcac4c0c811b8a688",
                 "parameters": [
                     {
@@ -370,16 +269,13 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Kamar berhasil di-assign ke tamu"
+                        "description": "Kamar berhasil di-assign"
                     },
                     "409": {
                         "description": "Kamar sudah terisi"
                     },
                     "404": {
                         "description": "Kamar tidak ditemukan"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
                     }
                 },
                 "security": [
