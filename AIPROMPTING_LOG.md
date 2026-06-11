@@ -13,3 +13,6 @@
 12. gimana cara menulis docker-entrypoint.sh yang bisa menunggu MySQL siap sebelum menjalankan artisan migrate, lalu otomatis seed jika database masih kosong?
 13. Apa yang menyebabkan Laravel membaca file database.php dengan namespace Pdo\Mysql dan kenapa ini hanya terjadi ketika project di-generate dari versi Laravel yang lebih baru?
 14. gimana best practice struktur response wrapper API agar konsisten di semua endpoint termasuk saat error validasi, resource not found, dan unauthorized access?
+15. JWT token dari SSO dosen perlu diverifikasi signature-nya dulu sebelum digunakan untuk hit SOAP dan RabbitMQ? Atau cukup langsung dipakai sebagai Bearer token? Apa bedanya secara security?
+16. SOAP sudah dapat response SUCCESS tapi ReceiptNumber kosong. LogContent saya isi dengan JSON string biasa tanpa CDATA. Apakah ini penyebabnya? Kenapa CDATA harus dipakai?
+17. Kalau saya taro SSO → SOAP → RabbitMQ secara sequential di dalam method assign(), dan salah satunya gagal di tengah jalan, apa yang terjadi ke transaksi DB lokalnya? Harus pakai database transaction atau gimana?
