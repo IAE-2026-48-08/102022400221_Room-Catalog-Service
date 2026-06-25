@@ -3,6 +3,7 @@ scalar DateTime
 scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
 
 type Query
+
 type Mutation
 
 #import models/room.graphql

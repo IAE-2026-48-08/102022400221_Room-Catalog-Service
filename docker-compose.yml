@@ -12,12 +12,14 @@ services:
     environment:
       APP_ENV: local
       APP_DEBUG: true
+      APP_KEY: ""
+      DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
       DB_DATABASE: room_catalog_db
       DB_USERNAME: laravel
       DB_PASSWORD: secret
-      IAE_API_KEY: KEY-MHS-292
+      IAE_API_KEY: 102022400221
       IAE_SSO_BASE_URL: https://iae-sso.virtualfri.id
       IAE_SSO_EMAIL: warga38@ktp.iae.id
       IAE_SSO_PASSWORD: KtpDigital2026!

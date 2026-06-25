@@ -9,9 +9,10 @@ if [ ! -f .env ]; then
     echo "✅ .env created from .env.example"
 fi
 
-# Generate app key if placeholder
-if grep -q "PLACEHOLDER_RUN_php_artisan_key_generate" .env; then
-    php artisan key:generate
+# Generate app key if empty
+APP_KEY_VALUE=$(grep -E '^APP_KEY=' .env | cut -d'=' -f2)
+if [ -z "$APP_KEY_VALUE" ]; then
+    php artisan key:generate --force
     echo "✅ App key generated"
 fi
 
@@ -36,6 +37,9 @@ fi
 # Generate Swagger docs
 php artisan l5-swagger:generate || true
 echo "✅ Swagger docs generated"
+
+# Clear config cache to pick up fresh environment values
+php artisan config:clear
 
 # Start Laravel server
 echo "🌐 Server running at http://localhost:8000"
