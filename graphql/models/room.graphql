@@ -14,11 +14,11 @@ enum RoomStatus {
 type Room {
     id: ID!
     room_number: String!
-    type: RoomType!
+    type: String!
     floor: Int!
     capacity: Int!
     price_per_night: Float!
-    status: RoomStatus!
+    status: String!
     description: String
     facilities: [String!]
     created_at: DateTime!
