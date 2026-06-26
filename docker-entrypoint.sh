@@ -28,7 +28,7 @@ php artisan migrate --force
 echo "✅ Migrations complete"
 
 # Seed if database is empty
-ROOM_COUNT=$(php -r "require 'vendor/autoload.php'; \$app = require 'bootstrap/app.php'; \$app->make('Illuminate\\\\Contracts\\\\Console\\\\Kernel')->bootstrap(); echo App\\\\Models\\\\Room::count();" 2>/dev/null)
+ROOM_COUNT=$(php check_db.php 2>/dev/null)
 if [ "$ROOM_COUNT" = "0" ] || [ -z "$ROOM_COUNT" ]; then
     php artisan db:seed --force
     echo "✅ Database seeded"
