@@ -13,13 +13,14 @@ services:
       APP_ENV: local
       APP_DEBUG: true
       APP_KEY: ""
+      CACHE_STORE: file
+      SESSION_DRIVER: file
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
       DB_DATABASE: room_catalog_db
       DB_USERNAME: laravel
       DB_PASSWORD: secret
-<<<<<<< HEAD
       API_KEY: 102022400221
       CENTRAL_SERVER_URL: https://iae-sso.virtualfri.id
       CENTRAL_TEAM_API_KEY: KEY-MHS-292
@@ -27,13 +28,11 @@ services:
       RABBITMQ_HOST: iae-sso.virtualfri.id
       RABBITMQ_HTTP_URL: https://iae-sso.virtualfri.id/api/v1/messages/publish
       RABBITMQ_EXCHANGE: iae.central.exchange
-=======
       IAE_API_KEY: 102022400221
       IAE_SSO_BASE_URL: https://iae-sso.virtualfri.id
       IAE_SSO_EMAIL: warga38@ktp.iae.id
       IAE_SSO_PASSWORD: KtpDigital2026!
       IAE_TEAM_ID: TEAM-11
->>>>>>> 3058462fb517fa033ed18f35e73479c85e35120e
     volumes:
       - .:/var/www
       - /var/www/vendor

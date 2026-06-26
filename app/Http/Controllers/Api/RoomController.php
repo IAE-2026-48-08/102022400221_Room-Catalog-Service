@@ -89,6 +89,13 @@ use OpenApi\Attributes as OA;
     in: 'header'
 )]
 
+#[OA\SecurityScheme(
+    securityScheme: 'bearerAuth',
+    type: 'http',
+    scheme: 'bearer',
+    bearerFormat: 'JWT'
+)]
+
 #[OA\Server(url: '/', description: 'Room Catalog Service')]
 
 #[OA\Tag(name: 'Rooms', description: 'API Endpoints untuk manajemen kamar hotel')]
@@ -107,7 +114,7 @@ class RoomController extends Controller
     #[OA\Get(
         path: '/api/v1/rooms',
         summary: 'Mengambil daftar seluruh kamar',
-        security: [['X-IAE-KEY' => []]],
+        security: [['X-IAE-KEY' => []], ['bearerAuth' => []]],
         tags: ['Rooms'],
         parameters: [
             new OA\Parameter(name: 'status', in: 'query', required: false,
@@ -153,7 +160,7 @@ class RoomController extends Controller
     #[OA\Get(
         path: '/api/v1/rooms/{id}',
         summary: 'Mengambil data spesifik kamar berdasarkan ID',
-        security: [['X-IAE-KEY' => []]],
+        security: [['X-IAE-KEY' => []], ['bearerAuth' => []]],
         tags: ['Rooms'],
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
@@ -192,7 +199,7 @@ class RoomController extends Controller
     #[OA\Post(
         path: '/api/v1/rooms',
         summary: 'Menambah data kamar baru (triggers SSO + SOAP audit + RabbitMQ)',
-        security: [['X-IAE-KEY' => []]],
+        security: [['X-IAE-KEY' => []], ['bearerAuth' => []]],
         tags: ['Rooms'],
         requestBody: new OA\RequestBody(
             required: true,
@@ -252,7 +259,7 @@ class RoomController extends Controller
     #[OA\Put(
         path: '/api/v1/rooms/{id}/status',
         summary: 'Mengubah status kamar',
-        security: [['X-IAE-KEY' => []]],
+        security: [['X-IAE-KEY' => []], ['bearerAuth' => []]],
         tags: ['Rooms'],
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
@@ -298,7 +305,7 @@ class RoomController extends Controller
     #[OA\Post(
         path: '/api/v1/rooms/{id}/assign',
         summary: 'Menetapkan kamar ke tamu (triggers SSO + SOAP audit + RabbitMQ)',
-        security: [['X-IAE-KEY' => []]],
+        security: [['X-IAE-KEY' => []], ['bearerAuth' => []]],
         tags: ['Rooms'],
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),

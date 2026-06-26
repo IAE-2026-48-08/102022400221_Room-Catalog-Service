@@ -53,12 +53,25 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Daftar kamar berhasil diambil"
+                        "description": "Daftar kamar berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RoomCollectionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 },
                 "security": [
                     {
                         "X-IAE-KEY": []
+                    },
+                    {
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -135,6 +148,9 @@
                 "security": [
                     {
                         "X-IAE-KEY": []
+                    },
+                    {
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -158,15 +174,28 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Data kamar berhasil diambil"
+                        "description": "Data kamar berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RoomSingleResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Kamar tidak ditemukan"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 },
                 "security": [
                     {
                         "X-IAE-KEY": []
+                    },
+                    {
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -217,11 +246,17 @@
                     },
                     "404": {
                         "description": "Kamar tidak ditemukan"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 },
                 "security": [
                     {
                         "X-IAE-KEY": []
+                    },
+                    {
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -276,11 +311,17 @@
                     },
                     "404": {
                         "description": "Kamar tidak ditemukan"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 },
                 "security": [
                     {
                         "X-IAE-KEY": []
+                    },
+                    {
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -330,11 +371,82 @@
                     },
                     "created_at": {
                         "type": "string",
-                        "example": "2024-01-01T00:00:00.000000Z"
+                        "example": "2024-01-01T00:00:00+07:00"
                     },
                     "updated_at": {
                         "type": "string",
-                        "example": "2024-01-01T00:00:00.000000Z"
+                        "example": "2024-01-01T00:00:00+07:00"
+                    }
+                },
+                "type": "object"
+            },
+            "RoomApiMeta": {
+                "properties": {
+                    "service_name": {
+                        "type": "string",
+                        "example": "Room-Catalog-Service"
+                    },
+                    "api_version": {
+                        "type": "string",
+                        "example": "v1"
+                    }
+                },
+                "type": "object"
+            },
+            "RoomCollectionResponse": {
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Data retrieved successfully"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Room"
+                        }
+                    },
+                    "meta": {
+                        "$ref": "#/components/schemas/RoomApiMeta"
+                    }
+                },
+                "type": "object"
+            },
+            "RoomSingleResponse": {
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Data retrieved successfully"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/Room"
+                    },
+                    "meta": {
+                        "$ref": "#/components/schemas/RoomApiMeta"
+                    }
+                },
+                "type": "object"
+            },
+            "RoomErrorResponse": {
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "error"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Room not found"
+                    },
+                    "errors": {
+                        "example": null,
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -345,13 +457,18 @@
                 "type": "apiKey",
                 "name": "X-IAE-KEY",
                 "in": "header"
+            },
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
             }
         }
     },
     "tags": [
         {
             "name": "Rooms",
-            "description": "Rooms"
+            "description": "API Endpoints untuk manajemen kamar hotel"
         }
     ]
 }
