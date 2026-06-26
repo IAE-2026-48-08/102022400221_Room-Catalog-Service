@@ -1,8 +1,8 @@
-FROM php:8.3-fpm
+FROM php:8.3-cli
 
 RUN apt-get update && apt-get install -y \
-    git curl libpng-dev libonig-dev libxml2-dev zip unzip \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd \
+    git curl libpng-dev libonig-dev libxml2-dev zip unzip default-mysql-client \
+    && docker-php-ext-install pdo pdo_mysql mysqli mbstring exif pcntl bcmath gd \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
