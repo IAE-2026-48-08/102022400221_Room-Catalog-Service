@@ -17,11 +17,13 @@ services:
       DB_DATABASE: room_catalog_db
       DB_USERNAME: laravel
       DB_PASSWORD: secret
-      IAE_API_KEY: KEY-MHS-292
-      IAE_SSO_BASE_URL: https://iae-sso.virtualfri.id
-      IAE_SSO_EMAIL: warga38@ktp.iae.id
-      IAE_SSO_PASSWORD: KtpDigital2026!
-      IAE_TEAM_ID: TEAM-11
+      API_KEY: 102022400221
+      CENTRAL_SERVER_URL: https://iae-sso.virtualfri.id
+      CENTRAL_TEAM_API_KEY: KEY-MHS-292
+      SOAP_AUDIT_URL: https://iae-sso.virtualfri.id/soap/v1/audit
+      RABBITMQ_HOST: iae-sso.virtualfri.id
+      RABBITMQ_HTTP_URL: https://iae-sso.virtualfri.id/api/v1/messages/publish
+      RABBITMQ_EXCHANGE: iae.central.exchange
     volumes:
       - .:/var/www
       - /var/www/vendor

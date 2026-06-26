@@ -8,24 +8,25 @@ use Symfony\Component\HttpFoundation\Response;
 
 class VerifyIaeKey
 {
+    /**
+     * Handle an incoming request.
+     *
+     * @param  Closure(Request): (Response)  $next
+     */
     public function handle(Request $request, Closure $next): Response
     {
         $apiKey = $request->header('X-IAE-KEY');
 
-        if (empty($apiKey)) {
+        $validKeys = array_filter([
+            config('app.api_key'),
+            env('IAE_API_KEY'),
+            102022400221, // NIM Saya
+        ]);
+
+        if (! $apiKey || ! in_array($apiKey, $validKeys)) {
             return response()->json([
                 'status'  => 'error',
-                'message' => 'Unauthorized. Header X-IAE-KEY is required.',
-                'errors'  => null,
-            ], 401);
-        }
-
-        $validKey = config('app.iae_api_key', env('IAE_API_KEY'));
-
-        if ($apiKey !== $validKey) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Unauthorized. Invalid API Key.',
+                'message' => 'Invalid or missing API Key',
                 'errors'  => null,
             ], 401);
         }

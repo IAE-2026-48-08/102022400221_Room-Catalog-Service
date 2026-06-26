@@ -8,65 +8,47 @@ use Illuminate\Support\Facades\Log;
 
 class IaeSsoService
 {
-    private string $baseUrl = 'https://iae-sso.virtualfri.id';
-    private string $apiKey  = 'KEY-MHS-292';
-    private string $email   = 'warga38@ktp.iae.id';
-    private string $password = 'KtpDigital2026!';
+    private string $baseUrl;
+    private string $apiKey;
 
-    /**
-     * Login M2M pakai API Key, return JWT token.
-     * Di-cache 50 menit biar tidak login terus tiap request.
-     */
-    public function getM2MToken(): string
+    public function __construct()
     {
-        return Cache::remember('iae_m2m_token', 3000, function () {
-            $response = Http::post("{$this->baseUrl}/api/v1/auth/token", [
-                'api_key' => $this->apiKey,
-            ]);
-
-            if ($response->failed()) {
-                Log::error('[IAE-SSO] M2M login gagal', ['response' => $response->body()]);
-                throw new \RuntimeException('IAE SSO M2M login failed: ' . $response->body());
-            }
-
-            $token = $response->json('token') ?? $response->json('access_token');
-
-            if (!$token) {
-                Log::error('[IAE-SSO] Token tidak ditemukan di response', ['body' => $response->json()]);
-                throw new \RuntimeException('IAE SSO: token tidak ada di response');
-            }
-
-            Log::info('[IAE-SSO] M2M token berhasil didapat');
-            return $token;
-        });
+        $this->baseUrl = env('CENTRAL_SERVER_URL');
+        $this->apiKey  = env('CENTRAL_TEAM_API_KEY');
     }
 
     /**
-     * Login end-user (warga) pakai email + password, return JWT token.
-     * Di-cache 50 menit.
+     * Login M2M pakai API Key, return JWT token.
+     * Di-cache sesuai TTL dari response (default 1 jam).
      */
-    public function getUserToken(): string
+    public function getM2MToken(): string
     {
-        return Cache::remember('iae_user_token', 3000, function () {
-            $response = Http::post("{$this->baseUrl}/api/v1/auth/token", [
-                'email'    => $this->email,
-                'password' => $this->password,
-            ]);
+        $cached = Cache::get('iae_m2m_token');
+        if ($cached) {
+            return $cached;
+        }
 
-            if ($response->failed()) {
-                Log::error('[IAE-SSO] User login gagal', ['response' => $response->body()]);
-                throw new \RuntimeException('IAE SSO user login failed: ' . $response->body());
-            }
+        $response = Http::post("{$this->baseUrl}/api/v1/auth/token", [
+            'api_key' => $this->apiKey,
+        ]);
 
-            $token = $response->json('token') ?? $response->json('access_token');
+        if ($response->failed()) {
+            Log::error('[IAE-SSO] M2M login gagal', ['response' => $response->body()]);
+            throw new \RuntimeException('IAE SSO M2M login failed: ' . $response->body());
+        }
 
-            if (!$token) {
-                throw new \RuntimeException('IAE SSO: token tidak ada di response');
-            }
+        $token = $response->json('token')
+            ?? throw new \RuntimeException('Token tidak ditemukan di response SSO');
 
-            Log::info('[IAE-SSO] User token berhasil didapat');
-            return $token;
-        });
+        $ttl = $response->json('expires_in', 3600);
+        Cache::put('iae_m2m_token', $token, $ttl);
+
+        Log::info('[IAE-SSO] M2M token berhasil didapat', [
+            'app_name' => $response->json('app.name'),
+            'team'     => $response->json('app.team'),
+        ]);
+
+        return $token;
     }
 
     /**
@@ -97,8 +79,8 @@ class IaeSsoService
     {
         $payload = $this->decodeJwtPayload($token);
 
-        $email = $payload['email'] ?? $this->email;
-        $name  = $payload['name']  ?? $payload['sub'] ?? 'IAE User';
+        $email = $payload['email'] ?? ($payload['app']['client_id'] ?? 'iae-m2m@internal') . '@m2m.iae.internal';
+        $name  = $payload['name'] ?? $payload['app']['name'] ?? $payload['sub'] ?? 'IAE User';
 
         // Upsert user lokal
         $user = \App\Models\User::firstOrCreate(
@@ -106,7 +88,7 @@ class IaeSsoService
             [
                 'name'     => $name,
                 'password' => bcrypt('iae-sso-user-' . time()),
-                'role'     => 'operator', // role lokal default untuk SSO user
+                'role'     => 'operator',
             ]
         );
 

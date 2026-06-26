@@ -7,9 +7,16 @@ use Illuminate\Support\Facades\Log;
 
 class IaeRabbitMqService
 {
-    private string $baseUrl  = 'https://iae-sso.virtualfri.id';
-    private string $exchange = 'iae.central.exchange';
-    private string $teamId   = 'TEAM-11';
+    private string $httpUrl;
+    private string $exchange;
+    private string $teamId;
+
+    public function __construct()
+    {
+        $this->httpUrl  = env('RABBITMQ_HTTP_URL');
+        $this->exchange = env('RABBITMQ_EXCHANGE', 'iae.central.exchange');
+        $this->teamId   = env('CENTRAL_TEAM_API_KEY');
+    }
 
     /**
      * Publish event JSON ke RabbitMQ dosen via REST API.
@@ -38,8 +45,15 @@ class IaeRabbitMqService
             'exchange' => $this->exchange,
         ]);
 
-        $response = Http::withToken($token)
-            ->post("{$this->baseUrl}/api/v1/messages/publish", $payload);
+        $response = Http::withHeaders([
+            'Content-Type'  => 'application/json',
+            'Authorization' => 'Bearer ' . $token,
+        ])->post($this->httpUrl, $payload);
+
+        Log::info('[AMQP-HTTP] Publish result', [
+            'status' => $response->status(),
+            'body'   => $response->json(),
+        ]);
 
         if ($response->failed()) {
             Log::error('[IAE-RABBITMQ] Publish gagal', [
@@ -47,7 +61,6 @@ class IaeRabbitMqService
                 'response' => $response->body(),
                 'event'    => $eventName,
             ]);
-            // Tidak throw exception agar tidak block response utama
             return false;
         }
 
@@ -65,14 +78,15 @@ class IaeRabbitMqService
     public function publishRoomCreated(string $token, array $room): bool
     {
         return $this->publish($token, 'room.created', [
-            'room_id'        => $room['id'],
-            'room_number'    => $room['room_number'],
-            'type'           => $room['type'],
-            'floor'          => $room['floor'],
-            'capacity'       => $room['capacity'],
-            'price_per_night'=> $room['price_per_night'],
-            'status'         => $room['status'] ?? 'available',
-            'created_by'     => 'warga38@ktp.iae.id',
+            'room_id'         => $room['id'],
+            'room_number'     => $room['room_number'],
+            'type'            => $room['type'],
+            'floor'           => $room['floor'],
+            'capacity'        => $room['capacity'],
+            'price_per_night' => $room['price_per_night'],
+            'status'          => $room['status'] ?? 'available',
+            'activity_name'   => 'RoomCreated',
+            'timestamp'       => now()->toIso8601String(),
         ]);
     }
 
@@ -82,14 +96,15 @@ class IaeRabbitMqService
     public function publishRoomAssigned(string $token, array $room, string $guestName, string $reservationId): bool
     {
         return $this->publish($token, 'room.assigned', [
-            'room_id'        => $room['id'],
-            'room_number'    => $room['room_number'],
-            'type'           => $room['type'],
-            'price_per_night'=> $room['price_per_night'],
-            'guest_name'     => $guestName,
-            'reservation_id' => $reservationId,
-            'assigned_at'    => now()->toISOString(),
-            'assigned_by'    => 'warga38@ktp.iae.id',
+            'room_id'         => $room['id'],
+            'room_number'     => $room['room_number'],
+            'type'            => $room['type'],
+            'price_per_night' => $room['price_per_night'],
+            'guest_name'      => $guestName,
+            'reservation_id'  => $reservationId,
+            'activity_name'   => 'RoomAssigned',
+            'assigned_at'     => now()->toIso8601String(),
+            'timestamp'       => now()->toIso8601String(),
         ]);
     }
 }

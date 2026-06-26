@@ -8,8 +8,14 @@ use App\Models\AuditLog;
 
 class IaeSoapService
 {
-    private string $baseUrl = 'https://iae-sso.virtualfri.id';
-    private string $teamId  = 'TEAM-11';
+    private string $endpoint;
+    private string $teamId;
+
+    public function __construct()
+    {
+        $this->endpoint = env('SOAP_AUDIT_URL');
+        $this->teamId   = env('CENTRAL_TEAM_API_KEY');
+    }
 
     /**
      * Kirim audit log ke SOAP endpoint dosen.
@@ -28,15 +34,23 @@ class IaeSoapService
         // Build SOAP XML Envelope sesuai skema wajib dosen
         $soapXml = $this->buildSoapEnvelope($activityName, $logJson);
 
+        Log::debug('SOAP Request', ['xml' => $soapXml]);
+
         Log::info('[IAE-SOAP] Mengirim audit', [
             'activity' => $activityName,
             'team_id'  => $this->teamId,
         ]);
 
-        $response = Http::withToken($token)
-            ->withHeaders(['Content-Type' => 'text/xml; charset=UTF-8'])
-            ->withBody($soapXml, 'text/xml')
-            ->post("{$this->baseUrl}/soap/v1/audit");
+        $response = Http::withHeaders([
+            'Content-Type'  => 'text/xml; charset=UTF-8',
+            'Authorization' => 'Bearer ' . $token,
+        ])->send('POST', $this->endpoint, ['body' => $soapXml]);
+
+        Log::debug('SOAP Response', [
+            'status'  => $response->status(),
+            'headers' => $response->headers(),
+            'body'    => $response->body(),
+        ]);
 
         if ($response->failed()) {
             Log::error('[IAE-SOAP] Audit gagal', [
@@ -90,18 +104,17 @@ XML;
      */
     private function parseReceiptNumber(string $xmlBody): string
     {
-        // Coba parse pakai SimpleXML
-        try {
-            $xml = simplexml_load_string($xmlBody);
-            if ($xml) {
-                $xml->registerXPathNamespace('iae', 'http://iae.central/audit');
-                $nodes = $xml->xpath('//iae:ReceiptNumber');
-                if (!empty($nodes)) {
-                    return (string) $nodes[0];
-                }
+        libxml_use_internal_errors(true);
+
+        // Coba parse pakai SimpleXML dengan namespace stripping
+        $cleaned = preg_replace('/(<\/?)(\\w+):/', '$1', $xmlBody);
+        $xml = simplexml_load_string($cleaned);
+
+        if ($xml !== false) {
+            $result = $xml->xpath('//ReceiptNumber');
+            if (!empty($result)) {
+                return (string) $result[0];
             }
-        } catch (\Exception $e) {
-            Log::warning('[IAE-SOAP] SimpleXML parse gagal, fallback ke regex');
         }
 
         // Fallback: regex
