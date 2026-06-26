@@ -69,6 +69,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (\Throwable $e, Request $request) {
             if ($request->is('api/*')) {
+                \Illuminate\Support\Facades\Log::error('[API-Error] Generic exception caught', [
+                    'exception' => get_class($e),
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
                 return response()->json([
                     'status'  => 'error',
                     'message' => $e->getMessage() ?: 'Internal server error',
