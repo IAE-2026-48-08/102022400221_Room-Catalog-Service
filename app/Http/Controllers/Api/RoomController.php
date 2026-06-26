@@ -180,7 +180,7 @@ class RoomController extends Controller
         $room = Room::find($id);
 
         if (! $room) {
-            return $this->errorResponse('Room not found', 404, null, $this->apiMeta());
+            return $this->errorResponse('Room not found', 404, null);
         }
 
         return $this->successResponse(
@@ -284,7 +284,7 @@ class RoomController extends Controller
         $room = Room::find($id);
 
         if (! $room) {
-            return $this->errorResponse('Room not found', 404, null, $this->apiMeta());
+            return $this->errorResponse('Room not found', 404, null);
         }
 
         $room->update($request->validated());
@@ -332,15 +332,14 @@ class RoomController extends Controller
         $room = Room::find($id);
 
         if (! $room) {
-            return $this->errorResponse('Room not found', 404, null, $this->apiMeta());
+            return $this->errorResponse('Room not found', 404, null);
         }
 
         if ($room->status !== 'available') {
             return $this->errorResponse(
                 'Room is not available. Current status: ' . $room->status,
                 409,
-                null,
-                $this->apiMeta()
+                null
             );
         }
 

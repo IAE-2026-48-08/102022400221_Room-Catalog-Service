@@ -26,13 +26,12 @@ abstract class Controller
     /**
      * Build a standardized error API response.
      */
-    protected function errorResponse(string $message, int $status = 400, mixed $errors = null, array $meta = []): JsonResponse
+    protected function errorResponse(string $message, int $status = 400, mixed $errors = null): JsonResponse
     {
         return response()->json([
             'status'  => 'error',
             'message' => $message,
             'errors'  => $errors,
-            'meta'    => $meta,
         ], $status);
     }
 }

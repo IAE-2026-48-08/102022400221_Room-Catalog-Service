@@ -36,7 +36,10 @@ class IaeSsoService
 
         // Build payload: prefer api_key (M2M), fall back to email+password
         if ($this->apiKey) {
-            $payload = ['api_key' => $this->apiKey];
+            $payload = [
+                'api_key' => $this->apiKey,
+                'nim'     => env('IAE_API_KEY') ?: env('API_KEY'),
+            ];
             $authMode = 'M2M api_key';
         } elseif ($this->email && $this->password) {
             $payload = ['email' => $this->email, 'password' => $this->password];

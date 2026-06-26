@@ -12,7 +12,7 @@ services:
     environment:
       APP_ENV: local
       APP_DEBUG: true
-      APP_KEY: ""
+      APP_KEY: "base64:R4HlQ58rUjq+vppLAfP0XXFqlf0WGTrOkFSYDiC0uS8="
       CACHE_STORE: file
       SESSION_DRIVER: file
       DB_CONNECTION: mysql
